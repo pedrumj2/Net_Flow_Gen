@@ -6,7 +6,7 @@ import java.util.Date;
 public class Main {
     private static MySqlCon mySqlCon;
     public static void main(String[] args) throws IOException, SQLException, ClassNotFoundException{
-        	mySqlCon = new MySqlCon("paper2", "fafdRE$3", "141.117.233.232");
+        	mySqlCon = new MySqlCon("D11", "fafdRE$3", "192.168.20.12");
         	ReadData();
     }
     private static void ReadData() throws IOException{
@@ -15,18 +15,71 @@ public class Main {
         Packet _packet;
         int prevID;
         Date x = new Date();
+        long durationNA=0;
+        long durationMax=0;
+        long durationUpdate =0;
+        long durationUpdatetest =0;
+        long startTime;
+        long endTime;
+        long durationInsertFlow = 0;
         System.out.println(x.toString());
         j =0;
             try{
+
+
+                 startTime = System.nanoTime();
                 _packet = mySqlCon.Get_packet_NA();
+                 endTime  = System.nanoTime();
+                 durationNA += (endTime - startTime)/1000000000;
+
                 while (_packet != null){
+                    startTime = System.nanoTime();
                     mySqlCon.Insert_Flow(_packet);
+                    endTime  = System.nanoTime();
+                    durationInsertFlow += (endTime - startTime)/1000000000;
+
+
+                    startTime = System.nanoTime();
+                    mySqlCon.test_update_packets(_packet);
+                    endTime  = System.nanoTime();
+                    durationUpdatetest += (endTime - startTime)/1000000000;
+
+
+                    startTime = System.nanoTime();
                     mySqlCon.update_packets(_packet);
+                    endTime  = System.nanoTime();
+                    durationUpdate += (endTime - startTime)/1000000000;
+
+
+
+
+                    startTime = System.nanoTime();
                     _packet = mySqlCon.get_packet_max();
+                    endTime  = System.nanoTime();
+                    durationMax += (endTime - startTime)/1000000000;
+
                     prevID = _packet.ID;
                     while (_packet != null){
+
+
+                        startTime = System.nanoTime();
+                        mySqlCon.test_update_packets(_packet);
+                        endTime  = System.nanoTime();
+                        durationUpdatetest += (endTime - startTime)/1000000000;
+
+
+                        startTime = System.nanoTime();
                         mySqlCon.update_packets(_packet);
+                        endTime  = System.nanoTime();
+                        durationUpdate += (endTime - startTime)/1000000000;
+
+
+
+                        startTime = System.nanoTime();
                         _packet = mySqlCon.get_packet_max();
+                        endTime  = System.nanoTime();
+                        durationMax += (endTime - startTime)/1000000000;
+
                         if (_packet.ID   == prevID){
                             _packet = null;
                         }
@@ -34,8 +87,15 @@ public class Main {
                             prevID = _packet.ID;
                         }
                     }
+
+
                     mySqlCon.update_row();
+
+                    startTime = System.nanoTime();
                     _packet = mySqlCon.Get_packet_NA();
+                    endTime  = System.nanoTime();
+                    durationNA += (endTime - startTime)/1000000000;
+
                 j++;
                     if (j % 1000 ==0){
                         System.out.println(j);
@@ -47,7 +107,7 @@ public class Main {
                 System.out.println(ex);
 
             }
-    x = new Date();
+
       System.out.println(x.toString());
 
 

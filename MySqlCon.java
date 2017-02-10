@@ -45,7 +45,7 @@ public class MySqlCon {
         Packet _packet;
 
         String query = "SELECT idPackets,  MAX(time) as time, ipSrc, ipDst, portSrc, " +
-                "portDst from "+ database+".packets  where flow = "  + flowRow + " group by idPackets order by time desc; ";
+                "portDst from "+ database+".packets  where flow = "  + flowRow + " group by idPackets order by time desc limit 1; ";
         ResultSet rs = stmt.executeQuery(query);
         if (rs.next()){
             _packet = new Packet(rs.getInt("ipSrc"), rs.getInt("ipDst"),
@@ -77,6 +77,30 @@ public class MySqlCon {
 
 
 
+
+    }
+
+    public void test_update_packets(Packet __packet) throws SQLException{
+        Packet _packet;
+
+
+        String query = "select * from "+database+".packets \n" +
+                "     Where time < " + (__packet.time + FLOWTIMEOUT) + "\n" +
+                "     and ipSrc = " + __packet.ipSrc + "\n" +
+                "     and ipDst = " + __packet.ipDst + "\n" +
+                "     and portSrc = " + __packet.portSrc + "\n" +
+                "     and portDst = " + __packet.portDst +  ";";
+        //  System.out.println(query);
+        stmt.execute(query);
+
+        query = "select * from "+database+".packets \n" +
+                "     Where time < " + (__packet.time + FLOWTIMEOUT) + "\n" +
+                "     and ipSrc = " + __packet.ipDst + "\n" +
+                "     and ipDst = " + __packet.ipSrc + "\n" +
+                "     and portSrc = " + __packet.portDst + "\n" +
+                "     and portDst = " + __packet.portSrc +  ";";
+        //  System.out.println(query);
+        stmt.execute(query);
 
     }
 
