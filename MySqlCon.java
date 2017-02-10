@@ -151,7 +151,7 @@ public class MySqlCon {
     public Packet Get_packet_NA() throws SQLException{
         Packet _packet;
 
-        String query = "SELECT time, ipSrc, ipDst, portSrc, portDst from "+database+".packets  where flow = 1  order by time asc limit 1;";
+        String query = "SELECT time, ipSrc, ipDst, portSrc, portDst from "+database+".packets  order by time asc limit 1;";
         ResultSet rs = stmt.executeQuery(query);
         if (rs.next()){
             _packet = new Packet(rs.getInt("ipSrc"), rs.getInt("ipDst"),
