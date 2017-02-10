@@ -24,10 +24,10 @@ public class Main {
         long durationInsertFlow = 0;
         System.out.println(x.toString());
         j =0;
-            try{
+           try{ /*
 
 
-                 startTime = System.nanoTime();
+                startTime = System.nanoTime();
                 _packet = mySqlCon.Get_packet_NA();
                  endTime  = System.nanoTime();
                  durationNA += (endTime - startTime)/1000000000;
@@ -102,13 +102,25 @@ public class Main {
                     }
 
                 }
+                 mySqlCon.Get_packetS(j);*/
+           while(true){
+               mySqlCon.Get_packetS(j);
+               if (j % 100 ==0){
+                   System.out.println(j);
+               }
+
+               j++;
+
+           }
             }
             catch(java.sql.SQLException ex){
                 System.out.println(ex);
 
             }
 
-      System.out.println(x.toString());
+
+
+      System.out.println(j);
 
 
     }

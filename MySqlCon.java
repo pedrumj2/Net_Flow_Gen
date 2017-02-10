@@ -129,7 +129,24 @@ public class MySqlCon {
         stmt.executeUpdate(query);
 
     }
-    
+
+    public Packet Get_packetS(int i) throws SQLException{
+        Packet _packet;
+
+        String query = "SELECT * from "+database+".packets  order by time asc limit 1, " + i + ";";
+        ResultSet rs = stmt.executeQuery(query);
+        if (rs.next()){
+            _packet = new Packet(rs.getInt("ipSrc"), rs.getInt("ipDst"),
+                    rs.getInt("portSrc"), rs.getInt("portDst"),
+                    rs.getInt("time"), 1);
+
+            return _packet;
+        }
+
+        return null;
+
+    }
+
 
     public Packet Get_packet_NA() throws SQLException{
         Packet _packet;
