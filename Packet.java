@@ -16,4 +16,13 @@ public class Packet {
         time = __time;
         ID = __ID;
     }
+
+
+    public Packet(int __ipSrc, int __ipDst, int __portSrc, int __portDst){
+        ipSrc = __ipSrc;
+        ipDst = __ipDst;
+        portSrc = __portSrc;
+        portDst = __portDst;
+
+    }
 }
