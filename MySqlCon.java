@@ -111,18 +111,19 @@ public class MySqlCon {
             rsNA = stmt.executeQuery(query);
             millionth++;
             System.out.println("added new mill");
-
+            if (rsNA.next()==false){
+                return null;
+            }
         }
-        if (rsNA.next()){
+
+
+
+
             _packet = new Packet(rsNA.getInt("ipSrc"), rsNA.getInt("ipDst"),
                     rsNA.getInt("portSrc"), rsNA.getInt("portDst"),
                     rsNA.getInt("time"), 1);
             System.out.println("returned new NA");
             return _packet;
-        }
-        else{
-            return null;
-        }
 
 
     }
