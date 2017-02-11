@@ -16,7 +16,7 @@ public class MySqlCon {
     String database;
     ResultSet rsNA;
     int millionth;
-    int getSize = 10000;
+    int getSize = 100000;
 
     private String insFlow;
    private java.util.Date _start;
@@ -81,7 +81,7 @@ public class MySqlCon {
           //  System.out.println("Inserted flow");
         }
         else {
-         
+
             query = "update "+database+".flows " +
                     " set endTime = from_unixtime( " + (__packet.time+FLOWTIMEOUT) + ")" +
                     "where ipSrc =  " + __packet.ipSrc +
