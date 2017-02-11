@@ -62,26 +62,31 @@ public class MySqlCon {
     public Packet get_packet_max(Packet __packet, Packet __tuple) throws  SQLException{
         Packet _packet;
 
-        String query = "SELECT idPackets,  MAX(time) as time, least(ipSrc, ipDst) as IP1, greatest(ipSrc, ipDst) as IP2, " +
+        String query = "SELECT idPackets,  time, least(ipSrc, ipDst) as IP1, greatest(ipSrc, ipDst) as IP2, " +
                 "least(portSrc, portDst) as PORT1,  greatest(portSrc, portDst) as PORT2 from "+ database+".packets   " +
                 " where least(ipSrc, ipDst) = " +__tuple.ipSrc +
                 " and greatest(ipSrc, ipDst) = " +__tuple.ipDst + " and  least(portSrc, portDst) = " +__tuple.portSrc +
-                " and greatest(portSrc, portDst) = " +__tuple.portDst + " and time < " + (__packet.time + FLOWTIMEOUT) + " group by idPackets order by time desc limit 1; ";
+                " and greatest(portSrc, portDst) = " +__tuple.portDst + " and time < " + (__packet.time + FLOWTIMEOUT) + " order by time; ";
         ResultSet rs = stmt.executeQuery(query);
-        if (rs.next()){
-            _packet = new Packet(rs.getInt("IP1"), rs.getInt("IP2"),
-                    rs.getInt("PORT1"), rs.getInt("PORT2"),
-                    rs.getInt("time"), rs.getInt("idPackets"));
 
-            return _packet;
-         
-        }
-        else{
-        
-
+        if (rs.next()==false) {
             return null;
-            
         }
+        while (rs.next()){
+
+
+        }
+
+        rs.previous();
+        _packet = new Packet(rs.getInt("IP1"), rs.getInt("IP2"),
+            rs.getInt("PORT1"), rs.getInt("PORT2"),
+            rs.getInt("time"), rs.getInt("idPackets"));
+
+
+        return _packet;
+
+
+
     }
     public void Insert_Flow(Packet __packet) throws SQLException{
 
