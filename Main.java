@@ -6,7 +6,7 @@ import java.util.Date;
 public class Main {
     private static MySqlCon mySqlCon;
     public static void main(String[] args) throws IOException, SQLException, ClassNotFoundException{
-        	mySqlCon = new MySqlCon("D11", "fafdRE$3", "192.168.20.12");
+        	mySqlCon = new MySqlCon("D11", "fafdRE$3", "127.0.0.1");
         	ReadData();
     }
     private static void ReadData() throws IOException{
@@ -19,7 +19,7 @@ public class Main {
         long durationMax=0;
         long durationUpdate =0;
         long durationUpdatetest =0;
-        long startTime;
+        long startTime =0;
         long endTime;
         long durationInsertFlow = 0;
         System.out.println(x.toString());
@@ -27,31 +27,34 @@ public class Main {
             try{
 
 
-                 startTime = System.nanoTime();
+             //    startTime = System.nanoTime();
                 _packet = mySqlCon.Get_packet_NA();
-                 endTime  = System.nanoTime();
-                 durationNA += (endTime - startTime)/1000000000;
+              //   endTime  = System.nanoTime();
+               //  durationNA += (endTime - startTime)/1000000000;
 
                 while (_packet != null){
-                    startTime = System.nanoTime();
+                   // startTime = System.nanoTime();
                     mySqlCon.Insert_Flow(_packet);
-                    endTime  = System.nanoTime();
-                    durationInsertFlow += (endTime - startTime)/1000000000;
+                   // endTime  = System.nanoTime();
+                    //durationInsertFlow += (endTime - startTime)/1000000000;
 
 
 
 
 
 
-                    startTime = System.nanoTime();
+                    //startTime = System.nanoTime();
                     _packet = mySqlCon.Get_packet_NA();
-                    endTime  = System.nanoTime();
-                    durationNA += (endTime - startTime)/1000000000;
+                    //endTime  = System.nanoTime();
+                    //durationNA += (endTime - startTime)/1000000000;
 
                 j++;
                     System.out.println(j);
-                    if (j % 1000 ==0){
+                    if (j % 10000 ==0){
                         System.out.println(j);
+                        endTime  = System.nanoTime();
+                        System.out.println((endTime - startTime)/1000000000);
+                        startTime =endTime;
                     }
 
                 }
