@@ -9,11 +9,14 @@ import java.util.ArrayList;
 public class MySqlCon {
     private int COUNTER = 10000;
     private Statement stmt;
+    private Statement stmtFlow;
     private Connection connection;
     int flowRow;
     int FLOWTIMEOUT = 60;
     String database;
-
+    ResultSet rsNA;
+    int millionth;
+    int getSize = 10000;
 
     private String insFlow;
    private java.util.Date _start;
@@ -22,10 +25,16 @@ public class MySqlCon {
     public MySqlCon(String __database, String __password, String __IP) throws SQLException, ClassNotFoundException {
         flowRow =2;
         database = __database;
+        millionth =1;
         try{
             Class.forName("com.mysql.jdbc.Driver");
             connection = DriverManager.getConnection("jdbc:mysql://"+__IP+"/" + __database, "root", __password);
             stmt = connection.createStatement();
+            stmtFlow= connection.createStatement();
+            String query = "SELECT time, least(ipSrc, ipDst) as ipSrc, greatest(ipSrc, ipDst) as ipDst, " +
+                    " least(portSrc, portDst) as portSrc, greatest(portSrc, portDst) as portDst from "+database+".packets  order by time asc limit "+millionth+", " + getSize + ";";
+            rsNA = stmt.executeQuery(query);
+            millionth++;
         }
         catch(java.sql.SQLException ex) {
             System.out.println("Database not connected!");
@@ -41,110 +50,76 @@ public class MySqlCon {
     public void update_row(){
         flowRow ++;
     }
-    public Packet get_packet_max() throws  SQLException{
-        Packet _packet;
 
-        String query = "SELECT idPackets,  MAX(time) as time, ipSrc, ipDst, portSrc, " +
-                "portDst from "+ database+".packets  where flow = "  + flowRow + " group by idPackets order by time desc limit 1; ";
-        ResultSet rs = stmt.executeQuery(query);
-        if (rs.next()){
-            _packet = new Packet(rs.getInt("ipSrc"), rs.getInt("ipDst"),
-                    rs.getInt("portSrc"), rs.getInt("portDst"),
-                    rs.getInt("time"), rs.getInt("idPackets"));
-
-            return _packet;
-         
-        }
-        else{
-        
-
-            return null;
-            
-        }
-    }
     public void Insert_Flow(Packet __packet) throws SQLException{
 
-        Packet _packet;
-        String query = "INSERT INTO "+database+".flows " +
-                "(idFlows, ipSrc, ipDst, portSrc, portDst) " +
-                " VALUES (" + Integer.toString(flowRow) +", "
-                                +(__packet.ipSrc) +", " +
-                                (__packet.ipDst) +", " +
-                                (__packet.portSrc) +", " +
-                                (__packet.portDst) +");";
-
-        stmt.executeUpdate(query);
 
 
+        String query = "select * from "+database+".flows " +
+                " where ipSrc =  " + __packet.ipSrc +
+                " and ipDst =  " + __packet.ipDst +
+                " and portSrc =  " + __packet.portSrc +
+                " and portDst =  " + __packet.portDst +
+                " and endTime >= from_unixtime(" + __packet.time + ")" +
+                " and startTime <= from_unixtime(" +__packet.time + ");";
 
+        ResultSet rs = stmtFlow.executeQuery(query);
+        if (rs.next()==false){
+            update_row();
+            query = "INSERT INTO "+database+".flows " +
+                    "(idFlows ,  ipSrc, ipDst, portSrc, portDst, startTime, endTime) " +
+                    " VALUES (" + Integer.toString(flowRow) +", "
+                    +(__packet.ipSrc) +", " +
+                    (__packet.ipDst) +", " +
+                    (__packet.portSrc) +", " +
+                    (__packet.portDst) + ", " +
+                    " from_unixtime(" + (__packet.time) +"), " +
+                    " from_unixtime( " + (__packet.time+FLOWTIMEOUT) + "));";
 
-    }
+            stmtFlow.executeUpdate(query);
+        }
+        else {
+            update_row();
+            query = "update "+database+".flows " +
+                    " set endTime = from_unixtime( " + (__packet.time+FLOWTIMEOUT) + ")" +
+                    "where ipSrc =  " + __packet.ipSrc +
+                    " and ipDst =  " + __packet.ipDst +
+                    " and portSrc =  " + __packet.portSrc +
+                    " and portDst =  " + __packet.portDst +
+                    " and endTime >= from_unixtime(" + __packet.time + ")" +
+                    " and startTime <= from_unixtime(" +__packet.time + ");";
 
-    public void test_update_packets(Packet __packet) throws SQLException{
-        Packet _packet;
-
-
-        String query = "select * from "+database+".packets \n" +
-                "     Where time < " + (__packet.time + FLOWTIMEOUT) + "\n" +
-                "     and ipSrc = " + __packet.ipSrc + "\n" +
-                "     and ipDst = " + __packet.ipDst + "\n" +
-                "     and portSrc = " + __packet.portSrc + "\n" +
-                "     and portDst = " + __packet.portDst +  ";";
-        //  System.out.println(query);
-        stmt.execute(query);
-
-        query = "select * from "+database+".packets \n" +
-                "     Where time < " + (__packet.time + FLOWTIMEOUT) + "\n" +
-                "     and ipSrc = " + __packet.ipDst + "\n" +
-                "     and ipDst = " + __packet.ipSrc + "\n" +
-                "     and portSrc = " + __packet.portDst + "\n" +
-                "     and portDst = " + __packet.portSrc +  ";";
-        //  System.out.println(query);
-        stmt.execute(query);
-
-    }
-
-    public void update_packets(Packet __packet) throws SQLException{
-        Packet _packet;
-
-
-                String query = "update "+database+".packets \n" +
-                 "       set packets.Flow = " + Integer.toString(flowRow) + "\n" +
-                "     Where time < " + (__packet.time + FLOWTIMEOUT) + "\n" +
-                "     and ipSrc = " + __packet.ipSrc + "\n" +
-                "     and ipDst = " + __packet.ipDst + "\n" +
-                "     and portSrc = " + __packet.portSrc + "\n" +
-                "     and portDst = " + __packet.portDst +  ";";
-         //  System.out.println(query);
-        stmt.executeUpdate(query);
-
-         query = "update "+database+".packets \n" +
-                "       set packets.Flow = " + Integer.toString(flowRow) + "\n" +
-                "     Where time < " + (__packet.time + FLOWTIMEOUT) + "\n" +
-                "     and ipSrc = " + __packet.ipDst + "\n" +
-                "     and ipDst = " + __packet.ipSrc + "\n" +
-                "     and portSrc = " + __packet.portDst + "\n" +
-                "     and portDst = " + __packet.portSrc +  ";";
-        //  System.out.println(query);
-        stmt.executeUpdate(query);
+            stmtFlow.executeUpdate(query);
+        }
 
     }
+
+
+
     
 
     public Packet Get_packet_NA() throws SQLException{
         Packet _packet;
 
-        String query = "SELECT time, ipSrc, ipDst, portSrc, portDst from "+database+".packets  where flow = 1  order by time asc limit 1;";
-        ResultSet rs = stmt.executeQuery(query);
-        if (rs.next()){
-            _packet = new Packet(rs.getInt("ipSrc"), rs.getInt("ipDst"),
-                    rs.getInt("portSrc"), rs.getInt("portDst"),
-                    rs.getInt("time"), 1);
+
+        if (rsNA.next()==false){
+            String query = "SELECT time, least(ipSrc, ipDst) as ipSrc, greatest(ipSrc, ipDst) as ipDst, " +
+            " least(portSrc, portDst) as portSrc, greatest(portSrc, portDst) as portDst from "+database+".packets  order by time asc limit " + millionth + ", " + getSize + ";";
+            rsNA = stmt.executeQuery(query);
+            millionth++;
+
+        }
+        if (rsNA.next()){
+            _packet = new Packet(rsNA.getInt("ipSrc"), rsNA.getInt("ipDst"),
+                    rsNA.getInt("portSrc"), rsNA.getInt("portDst"),
+                    rsNA.getInt("time"), 1);
 
             return _packet;
         }
+        else{
+            return null;
+        }
 
-        return null;
 
     }
 

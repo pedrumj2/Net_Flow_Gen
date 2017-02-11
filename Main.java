@@ -39,57 +39,9 @@ public class Main {
                     durationInsertFlow += (endTime - startTime)/1000000000;
 
 
-                    startTime = System.nanoTime();
-                    mySqlCon.test_update_packets(_packet);
-                    endTime  = System.nanoTime();
-                    durationUpdatetest += (endTime - startTime)/1000000000;
-
-
-                    startTime = System.nanoTime();
-                    mySqlCon.update_packets(_packet);
-                    endTime  = System.nanoTime();
-                    durationUpdate += (endTime - startTime)/1000000000;
 
 
 
-
-                    startTime = System.nanoTime();
-                    _packet = mySqlCon.get_packet_max();
-                    endTime  = System.nanoTime();
-                    durationMax += (endTime - startTime)/1000000000;
-
-                    prevID = _packet.ID;
-                    while (_packet != null){
-
-
-                        startTime = System.nanoTime();
-                        mySqlCon.test_update_packets(_packet);
-                        endTime  = System.nanoTime();
-                        durationUpdatetest += (endTime - startTime)/1000000000;
-
-
-                        startTime = System.nanoTime();
-                        mySqlCon.update_packets(_packet);
-                        endTime  = System.nanoTime();
-                        durationUpdate += (endTime - startTime)/1000000000;
-
-
-
-                        startTime = System.nanoTime();
-                        _packet = mySqlCon.get_packet_max();
-                        endTime  = System.nanoTime();
-                        durationMax += (endTime - startTime)/1000000000;
-
-                        if (_packet.ID   == prevID){
-                            _packet = null;
-                        }
-                        else{
-                            prevID = _packet.ID;
-                        }
-                    }
-
-
-                    mySqlCon.update_row();
 
                     startTime = System.nanoTime();
                     _packet = mySqlCon.Get_packet_NA();
@@ -97,6 +49,7 @@ public class Main {
                     durationNA += (endTime - startTime)/1000000000;
 
                 j++;
+                    System.out.println(j);
                     if (j % 1000 ==0){
                         System.out.println(j);
                     }
