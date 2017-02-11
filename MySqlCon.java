@@ -81,7 +81,7 @@ public class MySqlCon {
           //  System.out.println("Inserted flow");
         }
         else {
-            update_row();
+         
             query = "update "+database+".flows " +
                     " set endTime = from_unixtime( " + (__packet.time+FLOWTIMEOUT) + ")" +
                     "where ipSrc =  " + __packet.ipSrc +
