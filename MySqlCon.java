@@ -64,6 +64,7 @@ public class MySqlCon {
                 " and startTime <= from_unixtime(" +__packet.time + ");";
 
         ResultSet rs = stmtFlow.executeQuery(query);
+        System.out.println("Check If Flow exists");
         if (rs.next()==false){
             update_row();
             query = "INSERT INTO "+database+".flows " +
@@ -77,6 +78,7 @@ public class MySqlCon {
                     " from_unixtime( " + (__packet.time+FLOWTIMEOUT) + "));";
 
             stmtFlow.executeUpdate(query);
+            System.out.println("Inserted flow");
         }
         else {
             update_row();
@@ -90,6 +92,7 @@ public class MySqlCon {
                     " and startTime <= from_unixtime(" +__packet.time + ");";
 
             stmtFlow.executeUpdate(query);
+            System.out.println("updated flow");
         }
 
     }
@@ -107,13 +110,14 @@ public class MySqlCon {
             " least(portSrc, portDst) as portSrc, greatest(portSrc, portDst) as portDst from "+database+".packets  order by time asc limit " + millionth + ", " + getSize + ";";
             rsNA = stmt.executeQuery(query);
             millionth++;
+            System.out.println("added new mill");
 
         }
         if (rsNA.next()){
             _packet = new Packet(rsNA.getInt("ipSrc"), rsNA.getInt("ipDst"),
                     rsNA.getInt("portSrc"), rsNA.getInt("portDst"),
                     rsNA.getInt("time"), 1);
-
+            System.out.println("returned new NA");
             return _packet;
         }
         else{
