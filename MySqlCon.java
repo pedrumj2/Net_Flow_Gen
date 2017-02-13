@@ -25,14 +25,14 @@ public class MySqlCon {
     public MySqlCon(String __database, String __password, String __IP) throws SQLException, ClassNotFoundException {
         flowRow =2;
         database = __database;
-        millionth =1;
+        millionth =0;
         try{
             Class.forName("com.mysql.jdbc.Driver");
             connection = DriverManager.getConnection("jdbc:mysql://"+__IP+"/" + __database, "root", __password);
             stmt = connection.createStatement();
             stmtFlow= connection.createStatement();
             String query = "SELECT time, least(ipSrc, ipDst) as ipSrc, greatest(ipSrc, ipDst) as ipDst, " +
-                    " least(portSrc, portDst) as portSrc, greatest(portSrc, portDst) as portDst from "+database+".packets  order by time asc limit "+millionth+", " + getSize + ";";
+                    " least(portSrc, portDst) as portSrc, greatest(portSrc, portDst) as portDst from "+database+".packets  order by time asc limit "+millionth*getSize+", " + getSize + ";";
             rsNA = stmt.executeQuery(query);
             millionth++;
         }
