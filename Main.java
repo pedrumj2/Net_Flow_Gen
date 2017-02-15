@@ -6,7 +6,7 @@ import java.util.Date;
 public class Main {
     private static MySqlCon mySqlCon;
     public static void main(String[] args) throws IOException, SQLException, ClassNotFoundException{
-        	mySqlCon = new MySqlCon("D11", "fafdRE$3", "127.0.0.1");
+        	mySqlCon = new MySqlCon("D11", "fafdRE$3", "192.168.20.12");
         	ReadData();
     }
     private static void ReadData() throws IOException{
@@ -49,6 +49,7 @@ public class Main {
                     //durationNA += (endTime - startTime)/1000000000;
 
                 j++;
+                    System.out.println(j);
                    // System.out.println(j);
                     if (j % 10000 ==0){
                         System.out.println(j);
