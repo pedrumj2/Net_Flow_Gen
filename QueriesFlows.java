@@ -7,7 +7,7 @@ import MySqlJava.*;
 
 
 //handles connections to our database
-public class Queries {
+public class QueriesFlows {
 
 
     private int flowRow;
@@ -20,7 +20,7 @@ public class Queries {
     private Chunk chunk;
     public double laps;
 
-    public Queries(dbParams __dbparams) throws SQLException, ClassNotFoundException {
+    public QueriesFlows(dbParams __dbparams) throws SQLException, ClassNotFoundException {
         flowRow =2;
         sqlConnect = new SqlConnect(__dbparams);
         database = __dbparams.dbName;
