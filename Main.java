@@ -4,15 +4,15 @@ import java.util.Date;
 import MySqlJava.*;
 
 
-/*reads data from the fileName file and exports them to the mySQL database. It also generates flows*/
+
 public class Main {
     private static QueriesFlows queries;
     private static dbParams dbParams;
     public static void main(String[] args) throws IOException, SQLException, ClassNotFoundException{
-            dbParams = new dbParams("192.168.20.12", "fafdRE$3", "D11" );
-        	//queries = new QueriesFlows(dbParams);
-        //    generateFlows();
-        postProcess();
+            dbParams = new dbParams(args[0], args[1], args[2] );
+            queries = new QueriesFlows(dbParams, args[3]);
+            generateFlows();
+            //postProcess();
     }
 
     private static void postProcess() throws SQLException{

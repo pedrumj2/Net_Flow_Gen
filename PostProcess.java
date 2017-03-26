@@ -22,11 +22,26 @@ public class PostProcess {
 
     public void run() throws SQLException
     {
-        //reduceExtraMin();
-        //removeExtraNulls();
+        reduceExtraMin();
+        removeExtraNulls();
         //addtagColumn();
         //addIndices();
-        renameCols();
+        //renameCols();
+    }
+
+    //as part of the algorithm the flow lengths will over estimated by 60s. This will
+    //remove that effect
+    private void reduceExtraMin() throws SQLException{
+        String _query = " update "+database+".flows\n" +
+                " set endTime = date_sub(endTime, INTERVAL 1 minute)";
+        sqlConnect.updateQuery(_query);
+    }
+
+    //if for some reason there are some nulls in the flows, they are removed here.
+    private void removeExtraNulls() throws SQLException{
+        String _query = "delete from "+database+".flows\n" +
+                "where (ipSrc =1 or ipDst =1 or portSrc =0 or portDst =0) and idFlows > 1";
+        sqlConnect.updateQuery(_query);
     }
 
     //columns are named according to the net_con_count package convention
@@ -53,20 +68,9 @@ public class PostProcess {
         sqlConnect.updateQuery(_query);
     }
 
-    //for some reason there are some nulls in the flows, they are removed here.
-    private void removeExtraNulls() throws SQLException{
-        String _query = "delete from "+database+".flows\n" +
-                "where (ipSrc =1 or ipDst =1 or portSrc =0 or portDst =0) and idFlows > 1";
-        sqlConnect.updateQuery(_query);
-    }
 
-    //as part of the algorithm the flow lengths will over estimated by 60s. This will
-    //remove that effect
-    private void reduceExtraMin() throws SQLException{
-        String _query = " update "+database+".flows\n" +
-                " set endTime = date_sub(endTime, INTERVAL 1 minute)";
-        sqlConnect.updateQuery(_query);
-    }
+
+
 
 
 

@@ -19,14 +19,35 @@ public class QueriesFlows {
     private java.util.Date _start;
     private Chunk chunk;
     public double laps;
+    private String table;
 
-    public QueriesFlows(dbParams __dbparams) throws SQLException, ClassNotFoundException {
+
+    public QueriesFlows(dbParams __dbparams, String __packet_table) throws SQLException, ClassNotFoundException {
         flowRow =2;
         sqlConnect = new SqlConnect(__dbparams);
         database = __dbparams.dbName;
-        chunk =new Chunk(__dbparams, "SELECT time, least(ipSrc, ipDst) as ipSrc, greatest(ipSrc, ipDst) as ipDst, " +
-                " least(portSrc, portDst) as portSrc, greatest(portSrc, portDst) as portDst from " + database + ".packets  order by time asc ", getSize);
+        table = __packet_table;
+        chunk =new Chunk(__dbparams, "SELECT frame_time_epoch, least(ip_src, ip_dst) as ip1, greatest(ip_src, ip_dst) as ip2, " +
+                " least(port_src, port_dst) as port1, greatest(port_src, port_dst) as port2 from " + database + "." +
+                __packet_table +"  order by frame_time_epoch asc ", getSize);
+        insert_table();
 
+    }
+
+    private void insert_table(){
+        sqlConnect.updateQuery("CREATE TABLE if not exists paper3."+table+"_flows (\n" +
+                                "  idflows INT NOT NULL,\n" +
+                                "  port_src INT NULL,\n" +
+                                "  port_dst INT NULL,\n" +
+                                "  ip_src INT NULL,\n" +
+                                "  ip_dst INT NULL,\n" +
+                                "  start_time DOUBLE NULL,\n" +
+                                "  end_time DOUBLE NULL,\n" +
+                                "  PRIMARY KEY (idflows),\n" +
+                                "  INDEX T (port_src ASC, port_dst ASC, ip_src ASC, ip_dst ASC, end_time ASC, start_time ASC));");
+
+        sqlConnect.updateQuery("insert into "+table+"_flows(idflows, port_src, port_dst, ip_src, ip_dst, end_time, start_time)\n" +
+                "values  (1, -1, -1, 1, 1, -1, -1)");
     }
 
     public void update_row(){
@@ -35,38 +56,38 @@ public class QueriesFlows {
 
     public void Insert_Flow(Packet __packet) throws SQLException{
 
-        String query = "select * from "+database+".flows " +
-                " where ipSrc =  " + __packet.ipSrc +
-                " and ipDst =  " + __packet.ipDst +
-                " and portSrc =  " + __packet.portSrc +
-                " and portDst =  " + __packet.portDst +
-                " and endTime >= from_unixtime(" + __packet.time + ")" +
-                " and startTime <= from_unixtime(" +__packet.time + ");";
+        String query = "select * from "+database+"." + table + "_flows " +
+                " where ip_src =  " + __packet.ipSrc +
+                " and ip_dst =  " + __packet.ipDst +
+                " and port_src =  " + __packet.portSrc +
+                " and port_dst =  " + __packet.portDst +
+                " and end_time >= (" + __packet.time + ")" +
+                " and start_time <= (" +__packet.time + ");";
 
         ResultSet rs = sqlConnect.executeQuery(query);
         if (!rs.next()){
             update_row();
-            query = "INSERT INTO "+database+".flows " +
-                    "(idFlows ,  ipSrc, ipDst, portSrc, portDst, startTime, endTime) " +
+            query = "INSERT INTO "+database+"."+table+"_flows " +
+                    "(idflows, ip_src, ip_dst, port_src, port_dst, start_time, end_time) " +
                     " VALUES (" + Integer.toString(flowRow) +", "
-                    +(__packet.ipSrc) +", " +
-                    (__packet.ipDst) +", " +
-                    (__packet.portSrc) +", " +
+                    +(__packet.ipSrc) + ", " +
+                    (__packet.ipDst) + ", " +
+                    (__packet.portSrc) + ", " +
                     (__packet.portDst) + ", " +
-                    " from_unixtime(" + (__packet.time) +"), " +
-                    " from_unixtime( " + (__packet.time+FLOWTIMEOUT) + "));";
+                    " (" + (__packet.time) +"), " +
+                    " ( " + (__packet.time+FLOWTIMEOUT) + "));";
 
             sqlConnect.updateQuery(query);
         }
         else {
-            query = "update "+database+".flows " +
-                    " set endTime = from_unixtime( " + (__packet.time+FLOWTIMEOUT) + ")" +
-                    "where ipSrc =  " + __packet.ipSrc +
-                    " and ipDst =  " + __packet.ipDst +
-                    " and portSrc =  " + __packet.portSrc +
-                    " and portDst =  " + __packet.portDst +
-                    " and endTime >= from_unixtime(" + __packet.time + ")" +
-                    " and startTime <= from_unixtime(" +__packet.time + ");";
+            query = "update "+database+"."+table+"_flows " +
+                    " set end_time = ( " + (__packet.time+FLOWTIMEOUT) + ")" +
+                    "where ip_src =  " + __packet.ipSrc +
+                    " and ip_dst =  " + __packet.ipDst +
+                    " and port_src =  " + __packet.portSrc +
+                    " and port_dst =  " + __packet.portDst +
+                    " and end_time >= (" + __packet.time + ")" +
+                    " and start_time <= (" +__packet.time + ");";
 
             sqlConnect.updateQuery(query);
         }
@@ -79,9 +100,9 @@ public class QueriesFlows {
         if (_rs == null){
             return null;
         }
-        _packet = new Packet(_rs.getInt("ipSrc"), _rs.getInt("ipDst"),
-                _rs.getInt("portSrc"), _rs.getInt("portDst"),
-                _rs.getInt("time"), 1);
+        _packet = new Packet(_rs.getInt("ip1"), _rs.getInt("ip2"),
+                _rs.getInt("port1"), _rs.getInt("port2"),
+                _rs.getDouble("frame_time_epoch"), 1);
         return _packet;
     }
 
