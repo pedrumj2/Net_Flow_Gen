@@ -13,7 +13,7 @@ public class QueriesFlows {
     private int flowRow;
     private int FLOWTIMEOUT = 60;
     private String database;
-    private int getSize = 1000;
+    private int getSize = 100000;
     private SqlConnect sqlConnect;
     private String insFlow;
     private java.util.Date _start;

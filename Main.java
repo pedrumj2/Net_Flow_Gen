@@ -36,7 +36,7 @@ public class Main {
                     queries.Insert_Flow(_packet);
                     _packet = queries.Get_packet_NA();
                     j++;
-                    System.out.println(j);
+                    
                     if (j % 10000 ==0){
                         System.out.println(j);
                         endTime  = System.nanoTime();
