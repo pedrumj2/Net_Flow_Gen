@@ -25,7 +25,7 @@ public class PostProcess {
     public void run() throws SQLException
     {
         reduceExtraMin();
-        //removeExtraNulls();
+        removeExtraNulls();
 
     }
 
@@ -44,12 +44,6 @@ public class PostProcess {
         sqlConnect.updateQuery(_query);
     }
 
-
-    private void fillFlowCol() throws SQLException{
-        String _query = "delete from "+database+"." + table + "_flows\n" +
-                "where (ip_src <=1 or ip_dst <=1 or port_src <=0 or port_dst <=0) and idflows > 1";
-        sqlConnect.updateQuery(_query);
-    }
 
 
 
