@@ -11,9 +11,9 @@ public class Main {
 
     public static void main(String[] args) throws IOException, SQLException, ClassNotFoundException{
             dbParams = new dbParams(args[0], args[1], args[2] );
-            //queries = new QueriesFlows(dbParams, args[3]);
-            //generateFlows();
-            postProcess(args[3]);
+            queries = new QueriesFlows(dbParams, args[3]);
+            generateFlows();
+          //  postProcess(args[3]);
     }
 
     private static void postProcess(String __table) throws SQLException{
